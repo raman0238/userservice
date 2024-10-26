@@ -1,7 +1,10 @@
 package com.example.userservice.controller;
 
 import com.example.userservice.model.Student;
+import com.example.userservice.model.User;
+import com.example.userservice.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +14,8 @@ import java.util.List;
 
 @RestController
 public class UserController {
+    @Autowired
+    UserService userService;
 
     private List<Student> students = new ArrayList<>();
 
@@ -31,6 +36,17 @@ public class UserController {
           students.add(student);
           return  students;
     }
+
+    @PostMapping("/register")
+    public User register(@RequestBody User student) {
+        return userService.addUser(student);
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestBody User user) {
+        return userService.verify(user);
+    }
+
 
 
 }
