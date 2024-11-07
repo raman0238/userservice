@@ -38,7 +38,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
-        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers("register", "login")
+        httpSecurity.authorizeHttpRequests(request -> request.requestMatchers("user/register", "user/login", "user/validateToken")
                 .permitAll().anyRequest().authenticated());
        // httpSecurity.formLogin(Customizer.withDefaults());
         httpSecurity.httpBasic(Customizer.withDefaults());
