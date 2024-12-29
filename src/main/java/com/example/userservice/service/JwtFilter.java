@@ -30,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         String authHeader = request.getHeader("Authorization");
+        String xAuthToken = request.getHeader("X-Auth-Token");
         String token = null;
         String userName = null;
         if(authHeader != null) {
@@ -37,20 +38,26 @@ public class JwtFilter extends OncePerRequestFilter {
             userName = jwtService.extractUserName(token);
         }
 
-        if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if(xAuthToken == null && userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = applicationContext.getBean(UserDetailService.class).loadUserByUsername(userName);
             if(jwtService.isTokenValid(token, userDetails)) {
-                //this token is generated to pass this to net filter once the token is valid
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
-                // so that the token know about the request details
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                setAuthenticationtokenToContext(request, userDetails);
             }
+        } else {
+            UserDetails userDetails = applicationContext.getBean(UserDetailService.class).loadUserByUsername(userName);
+            setAuthenticationtokenToContext(request, userDetails);
         }
-
         // if user is not authenticated then login with username and pass with next filter
         filterChain.doFilter(request, response);
+    }
+
+    private static void setAuthenticationtokenToContext(HttpServletRequest request, UserDetails userDetails) {
+        //this token is generated to pass this to net filter once the token is valid
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities()
+        );
+        // so that the token know about the request details
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
     }
 }
