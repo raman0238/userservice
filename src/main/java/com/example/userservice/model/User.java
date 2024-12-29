@@ -1,8 +1,6 @@
 package com.example.userservice.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +13,7 @@ import lombok.Setter;
 @Entity
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     int id;
     @Column(name = "username")
     String userName;
